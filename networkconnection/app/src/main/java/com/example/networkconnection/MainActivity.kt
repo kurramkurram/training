@@ -2,13 +2,13 @@ package com.example.networkconnection
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.widget.TextView
 import com.example.networkconnection.retrofit.BASE_URL
 import com.example.networkconnection.retrofit.PersonService
-import okhttp3.ResponseBody
-import retrofit2.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Retrofit
-import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,21 +26,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        thread {
-            kotlin.runCatching {
-                loadPerson.clone().execute()
-            }.onSuccess { response: Response<ResponseBody> ->
-                if (response.isSuccessful) {
-                    Log.d(TAG, "#onCreate\$onSuccess success")
+        CoroutineScope(Dispatchers.IO).launch {
+            val response = loadPerson.clone().execute()
 
-                    response.body()?.string()?.let {
-                        Log.d(TAG, it)
-                    }
-                } else {
-                    Log.d(TAG, "#onCreate\$onSuccess failure")
+            CoroutineScope(Dispatchers.Main).launch {
+                if (response.isSuccessful) {
+                    findViewById<TextView>(R.id.textview).text = response.body()?.string() ?: ""
                 }
-            }.onFailure {
-                Log.d(TAG, "#onCreate\$onFailure failure")
             }
         }
     }
