@@ -1,5 +1,8 @@
 package com.example.networkconnection.retrofit
 
+import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -13,6 +16,16 @@ interface PersonService {
     ): Response
 }
 
-data class Person(val name: String, val note: String, val age: Int, val registerDate: String)
+@Serializable
+data class Person(
+    @SerializedName("name") val name: String,
+    @SerializedName("note") val note: String,
+    @SerializedName("age") val age: Int,
+    @SerializedName("registerDate") val registerDate: String
+)
 
-data class Response(val success: Boolean, val data: Person)
+@Serializable
+data class Response(
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("data") val data: Person
+)
