@@ -65,9 +65,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         install(JsonFeature) {
             serializer = KotlinxSerializer(
                 kotlinx.serialization.json.Json(kotlinx.serialization.json.Json.Default) {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
+                    prettyPrint = true  // コードフォーマッタ
+                    isLenient = true    // 引用符のない文字列、引用符のあるBooleanを許容
+                    ignoreUnknownKeys = true    // data classに存在しない未定義のキーのJSONエレメントが存在していても無視する
                 }
             )
 
@@ -77,25 +77,25 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         }
 
-        install(Logging) {
-            logger = object : Logger {
+        install(Logging) {// Logging plugin
+            logger = object : Logger { // カスタムログ出力
                 override fun log(message: String) {
-                    Log.v(TAG, "#onCreate ktor -> $message")
+                    Log.v(TAG, "#getPersonWithKtor message -> $message")
                 }
             }
-            level = LogLevel.ALL
+            level = LogLevel.ALL    // ログの出力量（request/response, header/body）
         }
 
-        install(ResponseObserver) {
-            onResponse {
-                Log.d(TAG, "#onCreate ktor $it")
+        install(ResponseObserver) { // Response plugin
+            onResponse {// response
+                Log.d(TAG, "#getPersonWithKtor onResponse -> $it")
             }
         }
 
-        install(DefaultRequest) {
+        install(DefaultRequest) {// リクエストパラメータを指定
             header(HttpHeaders.ContentType, ContentType.Application.Json)
         }
-    }.get("$BASE_URL/api/persons/$name")
+    }.use { it.get("$BASE_URL/api/persons/$name") }
 
     override fun onClick(p0: View?) {
         val name = "Shakespeare"
