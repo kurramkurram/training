@@ -1,0 +1,26 @@
+package com.example.workmanager
+
+import android.content.Context
+import android.util.Log
+import androidx.work.*
+import java.lang.Thread.sleep
+
+class WorkerEx(context: Context, workerParams: WorkerParameters) :
+    Worker(context, workerParams) {
+
+    override fun doWork(): Result {
+        Log.d(TAG, "#doWork")
+
+        (0..100 step 10).forEach {
+            Log.d(TAG, "#doWork it = $it")
+            setProgressAsync(workDataOf(PROGRESS to it))
+            sleep(300)
+        }
+
+        return Result.success()
+    }
+
+    companion object {
+        private const val TAG = "WorkerEx"
+    }
+}
