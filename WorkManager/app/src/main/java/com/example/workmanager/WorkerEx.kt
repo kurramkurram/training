@@ -14,10 +14,10 @@ class WorkerEx(context: Context, workerParams: WorkerParameters) :
         (0..100 step 10).forEach {
             Log.d(TAG, "#doWork it = $it")
             setProgressAsync(workDataOf(PROGRESS to it))
-            sleep(300)
+            sleep(1000)
         }
 
-        return Result.success()
+        return Result.success(workDataOf(KEY_COMPLETED to true))
     }
 
     companion object {
