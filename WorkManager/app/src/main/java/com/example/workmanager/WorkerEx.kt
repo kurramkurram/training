@@ -17,7 +17,7 @@ class WorkerEx(context: Context, workerParams: WorkerParameters) :
             sleep(1000)
         }
 
-        return Result.success(workDataOf(KEY_COMPLETED to true))
+        return Result.success()
     }
 
     companion object {
