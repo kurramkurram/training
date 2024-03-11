@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import com.example.networkconnection.data.Person
 import com.example.networkconnection.data.Response
 import com.example.networkconnection.retrofit.PersonService
 import io.ktor.client.*
@@ -21,6 +22,8 @@ import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -37,6 +40,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         setContentView(R.layout.activity_main)
         findViewById<Button>(R.id.button_ktor).setOnClickListener(this)
         findViewById<Button>(R.id.button_retrofit).setOnClickListener(this)
+        findViewById<Button>(R.id.http_url_connection).setOnClickListener(this)
     }
 
     /**
@@ -97,6 +101,25 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }.use { it.get("$BASE_URL/api/persons/$name") }
 
+    /**
+     * HttpURLConnectionクラスを利用して通信を行う.
+     *
+     * @param name 取得する対象の名前
+     * @return Response [Response]
+     */
+    private fun getPersonWithHttp(name: String): Response {
+        var response: String
+        runBlocking {
+            response = HttpsConnectionWrapper().doHttpsRequest("$BASE_URL/api/persons/$name")
+        }
+        val parser = JsonParser(response)
+        val data = parser.getProperty("data") as JSONObject
+        val n = data.getString("name")
+        val note = data.getString("note")
+        val age = data.getInt("age")
+        return Response(success = true, data = Person(n, note, age, ""))
+    }
+
     override fun onClick(p0: View?) {
         val name = "Shakespeare"
         lifecycleScope.launch {
@@ -104,6 +127,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val response = when (p0!!.id) {
                     R.id.button_retrofit -> getPersonWithRetrofit(name)
                     R.id.button_ktor -> getPersonWithKtor(name)
+                    R.id.http_url_connection -> getPersonWithHttp(name)
                     else -> return@launch
                 }
 
